@@ -11,6 +11,7 @@ from util import db_connection
 from util import pxc_startup
 from util import ps_startup
 
+backup_dir=""
 
 class Utility:
     def __init__(self, debug):
@@ -166,6 +167,12 @@ class Utility:
                 print(copy_backup)
             os.system(copy_backup)
 
+        # Set backup dir
+        global backup_dir
+        backup_dir=workdir + "/backup"
+        if self.debug == 'YES':
+            print("Backup dir path: ", backup_dir)
+
         # Copy keyring file to destination directory for encryption startup
         if encryption == 'YES':
             os.system("cp " + source_datadir + "/keyring " + dest_datadir)
@@ -267,10 +274,14 @@ class Utility:
             if self.debug == 'YES':
                 print(data_dir)
             data_dir = os.popen(data_dir).read().rstrip()
-            query = "cat " + data_dir + "xtrabackup_binlog_pos_innodb | awk '{print $1}'"
+            query = "cat " + backup_dir + "/xtrabackup_binlog_info | awk '{print $1}'"
             master_log_file = os.popen(query).read().rstrip()
-            query = "cat " + data_dir + "xtrabackup_binlog_pos_innodb | awk '{print $2}'"
+            query = "cat " + backup_dir + "/xtrabackup_binlog_info | awk '{print $2}'"
             master_log_pos = os.popen(query).read().rstrip()
+            if self.debug == 'YES':
+                print("Binlog data from xtrabackup_binlog_info")
+                print("master_log_file: ", master_log_file)
+                print("master_log_pos: ", master_log_pos)
         else:
             master_log_file = basedir + "/bin/mysql --user=root --socket=" + \
                               master_socket + \
