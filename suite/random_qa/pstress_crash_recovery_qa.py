@@ -5,6 +5,7 @@ import argparse
 import time
 import subprocess
 import itertools
+import random
 cwd = os.path.dirname(os.path.realpath(__file__))
 parent_dir = os.path.normpath(os.path.join(cwd, '../../'))
 sys.path.insert(0, parent_dir)
@@ -22,10 +23,10 @@ parser.add_argument('-d', '--debug', action='store_true',
 args = parser.parse_args()
 if args.encryption_run is True:
     encryption = 'YES'
-    PQUERY_EXTRA = ""
+    PSTRESS_EXTRA = ""
 else:
     encryption = 'NO'
-    PQUERY_EXTRA = "--no-enc"
+    PSTRESS_EXTRA = "--no-encryption"
 
 if args.debug is True:
     debug = 'YES'
@@ -35,9 +36,9 @@ else:
 utility_cmd = utility.Utility(debug)
 utility_cmd.check_python_version()
 
-class RandomPQueryQA:
+class RandomPstressQA:
     def start_pxc(self):
-        # Start PXC cluster for pquery run
+        # Start PXC cluster for pstress run
         dbconnection_check = db_connection.DbConnection(USER, WORKDIR + '/node1/mysql.sock')
         server_startup = pxc_startup.StartCluster(parent_dir, WORKDIR, BASEDIR, int(NODE), debug)
         result = server_startup.sanity_check()
@@ -80,19 +81,20 @@ class RandomPQueryQA:
                 break  # break the loop if mysqld is running
 
     def data_load(self, socket, db):
-        # pquery crash recovery qa
+        # pstress crash recovery qa
         self.start_pxc()
+        n = random.randint(10000, 99999)
         for i in range(1, 10):
-            PQUERY_CMD = PQUERY_BIN + " --database=" + db + " --threads=50 --logdir=" + \
+            PSTRESS_CMD = PSTRESS_BIN + " --database=" + db + " --threads=50 --logdir=" + \
                          WORKDIR + "/log --log-all-queries --log-failed-queries --user=root --socket=" + \
-                         socket + " --seed 1000 --tables 25 --records 1000 " + \
-                         PQUERY_EXTRA + " --seconds 300 --undo-tbs-count 0  --sql-file " + \
-                         PQUERY_GRAMMER_FILE + " --step " + str(i) + " > " + \
-                         WORKDIR + "/log/pquery_run.log"
-            utility_cmd.check_testcase(0, "PQUERY RUN command : " + PQUERY_CMD)
-            query_status = os.system(PQUERY_CMD)
+                         socket + " --seed " + str(n) + " --tables 25 --records 1000 " + \
+                         PSTRESS_EXTRA + " --seconds 300 --grammar-file " + \
+                         PSTRESS_GRAMMAR_FILE + " --step " + str(i) + " > " + \
+                         WORKDIR + "/log/pstress_run.log"
+            utility_cmd.check_testcase(0, "PSTRESS RUN command : " + PSTRESS_CMD)
+            query_status = os.system(PSTRESS_CMD)
             if int(query_status) != 0:
-                utility_cmd.check_testcase(1, "ERROR!: PQUERY run is failed")
+                utility_cmd.check_testcase(1, "ERROR!: PSTRESS run failed")
             # kill existing mysqld process
             if debug == 'YES':
                 print("Killing existing mysql process using 'kill -9' command")
@@ -110,11 +112,11 @@ class RandomPQueryQA:
                 self.startup_check(j)
 
 
-print("--------------------")
-print("PXC Random PQUERY QA")
-print("--------------------")
-random_pquery_qa = RandomPQueryQA()
-if not os.path.isfile(PQUERY_BIN):
-    print(PQUERY_BIN + ' does not exist')
+print("-----------------------------")
+print("PXC Crash Recovery PSTRESS QA")
+print("-----------------------------")
+random_pstress_qa = RandomPstressQA()
+if not os.path.isfile(PSTRESS_BIN):
+    print(PSTRESS_BIN + ' does not exist')
     exit(1)
-random_pquery_qa.data_load(WORKDIR + '/node1/mysql.sock', 'test')
+random_pstress_qa.data_load(WORKDIR + '/node1/mysql.sock', 'test')

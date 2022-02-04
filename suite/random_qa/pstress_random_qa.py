@@ -20,10 +20,10 @@ parser.add_argument('-d', '--debug', action='store_true',
 args = parser.parse_args()
 if args.encryption_run is True:
     encryption = 'YES'
-    PQUERY_EXTRA = ""
+    PSTRESS_EXTRA = ""
 else:
     encryption = 'NO'
-    PQUERY_EXTRA = "--no-enc"
+    PSTRESS_EXTRA = "--no-encryption"
 
 if args.debug is True:
     debug = 'YES'
@@ -34,9 +34,9 @@ utility_cmd = utility.Utility(debug)
 utility_cmd.check_python_version()
 
 
-class RandomPQueryQA:
+class RandomPstressQA:
     def start_pxc(self):
-        # Start PXC cluster for pquery run
+        # Start PXC cluster for pstress run
         dbconnection_check = db_connection.DbConnection(USER, WORKDIR + '/node1/mysql.sock')
         server_startup = pxc_startup.StartCluster(parent_dir, WORKDIR, BASEDIR, int(NODE), debug)
         result = server_startup.sanity_check()
@@ -66,7 +66,7 @@ class RandomPQueryQA:
 
     def data_load(self, socket, db):
 
-        # pquery random load
+        # pstress random load
         threads = [16, 64, 512, 1024]
         tables = [16, 32, 64, 128]
         records = [100, 500, 1000]
@@ -74,23 +74,23 @@ class RandomPQueryQA:
         for thread, table, record, seed in \
                 itertools.product(threads, tables, records, seeds):
             self.start_pxc()
-            pquery_cmd = PQUERY_BIN + " --database=" + db + " --threads=" + str(table) + " --logdir=" + \
+            pstress_cmd = PSTRESS_BIN + " --database=" + db + " --threads=" + str(table) + " --logdir=" + \
                 WORKDIR + "/log --log-all-queries --log-failed-queries --user=root --socket=" + \
                 socket + " --seed " + str(seed) + " --tables " + str(table) + " " + \
-                PQUERY_EXTRA + " --seconds 300  --sql-file " + \
-                PQUERY_GRAMMER_FILE + " --records " + str(record) + "> " + \
-                WORKDIR + "/log/pquery_run.log"
-            utility_cmd.check_testcase(0, "PQUERY RUN command : " + pquery_cmd)
-            query_status = os.system(pquery_cmd)
+                PSTRESS_EXTRA + " --seconds 300  --grammar-file " + \
+                PSTRESS_GRAMMAR_FILE + " --records " + str(record) + "> " + \
+                WORKDIR + "/log/pstress_run.log"
+            utility_cmd.check_testcase(0, "PSTRESS RUN command : " + pstress_cmd)
+            query_status = os.system(pstress_cmd)
             if int(query_status) != 0:
-                utility_cmd.check_testcase(1, "ERROR!: PQUERY run is failed")
+                utility_cmd.check_testcase(1, "ERROR!: PSTRESS run is failed")
 
 
 print("--------------------")
-print("PXC Random PQUERY QA")
+print("PXC Random PSTRESS QA")
 print("--------------------")
-random_pquery_qa = RandomPQueryQA()
-if not os.path.isfile(PQUERY_BIN):
-    print(PQUERY_BIN + ' does not exist')
+random_pstress_qa = RandomPstressQA()
+if not os.path.isfile(PSTRESS_BIN):
+    print(PSTRESS_BIN + ' does not exist')
     exit(1)
-random_pquery_qa.data_load(WORKDIR + '/node1/mysql.sock', 'test')
+random_pstress_qa.data_load(WORKDIR + '/node1/mysql.sock', 'test')

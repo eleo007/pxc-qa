@@ -12,7 +12,7 @@ utility_cmd.check_python_version()
 
 # Reading initial configuration
 config = configparser.ConfigParser()
-config.read('pquery3-run.ini')
+config.read('pstress-run.ini')
 
 WORKDIR = config['config']['workdir']
 RUNDIR = config['config']['rundir']
@@ -25,21 +25,21 @@ SAVE_SQL = config['config']['save_sql']
 SAVE_TRIALS_WITH_CORE = config['config']['save_trials_with_core']
 ENCRYPTION = config['config']['encryption']
 MY_EXTRA = config['config']['myextra']
-PQUERY_BIN = config['pquery']['pquery_bin']
-PQUERY_BASE_CONFIG = config['pquery']['pquery_base_config']
-TABLES = config['pquery']['tables']
-RECORDS = config['pquery']['records']
-SEED = config['pquery']['seed']
-RECREATE_TABLE = config['pquery']['recreate_table']
-OPTIMIZE = config['pquery']['optimize']
-RENAME_COLUMN = config['pquery']['rename_column']
-ADD_INDEX = config['pquery']['add_index']
-DROP_INDEX = config['pquery']['drop_index']
-ADD_COLUMN = config['pquery']['add_column']
-PRIMARY_KEY_PROBABLITY = config['pquery']['primary_key_probablity']
+PSTRESS_BIN = config['pstress']['pstress_bin']
+PSTRESS_BASE_CONFIG = config['pstress']['pstress_base_config']
+TABLES = config['pstress']['tables']
+RECORDS = config['pstress']['records']
+SEED = config['pstress']['seed']
+RECREATE_TABLE = config['pstress']['recreate_table']
+OPTIMIZE = config['pstress']['optimize']
+RENAME_COLUMN = config['pstress']['rename_column']
+ADD_INDEX = config['pstress']['add_index']
+DROP_INDEX = config['pstress']['drop_index']
+ADD_COLUMN = config['pstress']['add_column']
+PRIMARY_KEY_PROBABLITY = config['pstress']['primary_key_probablity']
 
 
-class PQueryRun:
+class PstressRun:
     def printit(self, text):
         now = datetime.now().strftime("%H:%M:%S ")
         print(now + ' ' + f'{text:100}')
@@ -67,10 +67,10 @@ class PQueryRun:
 
 
 print("-------------------------")
-print("\nPXC pquery run         ")
+print("\nPXC pstress run         ")
 print("-------------------------")
-pquery_run = PQueryRun()
+pstress_run = PstressRun()
 if SERVER == "pxc":
-    pquery_run.start_server(NODE)
+    pstress_run.start_server(NODE)
 elif SERVER == "ps":
-    pquery_run.start_server(1)
+    pstress_run.start_server(1)
