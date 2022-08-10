@@ -103,6 +103,8 @@ class SetupReplication:
             utility_cmd.check_testcase(result, "PS: Configuration file creation")
         result = server_startup.add_myextra_configuration(script_dir + '/replication.cnf')
         utility_cmd.check_testcase(result, "PS: Adding custom configuration")
+        result = server_startup.initialize_cluster()
+        utility_cmd.check_testcase(result, "PS: Initializing PS server")
         result = server_startup.start_server(my_extra)
         utility_cmd.check_testcase(result, "PS: Cluster startup")
         result = dbconnection_check.connection_check()
