@@ -99,13 +99,13 @@ class ConsistencyCheck:
             sys.stdout = sys.__stdout__
             create_db = self.basedir + "/bin/mysql --user=root --socket=" + \
                 socket + ' -Bse"drop database if exists ' + db + \
-                ';create database ' + db + ';" 2>&1'
+                ';create database ' + db + ';"'
             if debug == 'YES':
                 print(create_db)
             result = os.system(create_db)
             utility_cmd.check_testcase(result, "Sample DB creation")
             data_load_query = self.basedir + "/bin/mysql --user=root --socket=" + \
-                socket + ' ' + db + ' -f <  /tmp/dataload.sql >/dev/null 2>&1'
+                socket + ' ' + db + ' -f <  /tmp/dataload.sql >/dev/null'
             if debug == 'YES':
                 print(data_load_query)
             result = os.system(data_load_query)
