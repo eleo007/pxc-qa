@@ -96,13 +96,13 @@ class SSLCheck:
             sys.stdout = sys.__stdout__
             create_db = self.basedir + "/bin/mysql --user=root --socket=" + \
                 node1_socket + ' -Bse"drop database if exists ' + db + \
-                ';create database ' + db + ';" 2>&1'
+                ';create database ' + db + ';"'
             if debug == 'YES':
                 print(create_db)
             result = os.system(create_db)
             utility_cmd.check_testcase(result, "SSL QA sample DB creation")
             data_load_query = self.basedir + "/bin/mysql --user=root --socket=" + \
-                node1_socket + ' ' + db + ' -f <  /tmp/dataload.sql >/dev/null 2>&1'
+                node1_socket + ' ' + db + ' -f <  /tmp/dataload.sql'
             if debug == 'YES':
                 print(data_load_query)
             result = os.system(data_load_query)
