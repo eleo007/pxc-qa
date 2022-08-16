@@ -105,7 +105,7 @@ class ConsistencyCheck:
             result = os.system(create_db)
             utility_cmd.check_testcase(result, "Sample DB creation")
             data_load_query = self.basedir + "/bin/mysql --user=root --socket=" + \
-                socket + ' ' + db + ' -f <  /tmp/dataload.sql >/dev/null'
+                socket + ' ' + db + ' -f <  /tmp/dataload.sql'
             if debug == 'YES':
                 print(data_load_query)
             result = os.system(data_load_query)
