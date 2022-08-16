@@ -29,18 +29,20 @@ class RQGDataGen:
         # Get RQG module
         module = parent_dir + '/randgen/conf/' + module
         master_port = self.basedir + "/bin/mysql --user=root --socket=" + socket + \
-            ' -Bse"select @@port" 2>&1'
+            ' -Bse"select @@port"'
         port = os.popen(master_port).read().rstrip()
         # Create schema for RQG run
         create_db = self.basedir + "/bin/mysql --user=root --socket=" + socket + \
             ' -Bse"drop database if exists ' + db + \
-            ';create database ' + db + ';" 2>&1'
+            ';create database ' + db + ';"'
+        if debug == 'YES':
+            print(create_db)
         os.system(create_db)
         if int(self.version) > int("050700"):
             create_user = self.basedir + "/bin/mysql --user=root --socket=" + socket + \
                 ' -Bse" drop user if exists \'rqg_test\'@\'%\'; FLUSH PRIVILEGES; ' \
                 'create user rqg_test@\'%\' identified with mysql_native_password by \'\'; ' \
-                'grant all on *.* to rqg_test@\'%\';" 2>&1'
+                'grant all on *.* to rqg_test@\'%\';"'
             os.system(create_user)
         # Checking RQG module
         os.chdir(parent_dir + '/randgen')
