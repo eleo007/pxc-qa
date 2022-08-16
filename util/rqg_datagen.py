@@ -35,8 +35,6 @@ class RQGDataGen:
         create_db = self.basedir + "/bin/mysql --user=root --socket=" + socket + \
             ' -Bse"drop database if exists ' + db + \
             ';create database ' + db + ';"'
-        if debug == 'YES':
-            print(create_db)
         os.system(create_db)
         if int(self.version) > int("050700"):
             create_user = self.basedir + "/bin/mysql --user=root --socket=" + socket + \
