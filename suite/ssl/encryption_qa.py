@@ -127,6 +127,14 @@ class EncryptionTest:
                     print(data_load_query)
                 result = os.system(data_load_query)
                 utility_cmd.check_testcase(result, "Sample data load")
+
+            # Checksum for tables in test DB for 8.0.
+            version = utility_cmd.version_check(BASEDIR)
+            if int(version) >= int("080000"):
+                result = utility_cmd.check_table_count(BASEDIR, 'test', WORKDIR + '/node1/mysql.sock',
+                                                                    WORKDIR + '/node2/mysql.sock')
+                utility_cmd.check_testcase(result, "Checksum run for DB: test")
+
             utility_cmd.stop_pxc(WORKDIR, BASEDIR, NODE)
 
 
